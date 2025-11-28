@@ -11,11 +11,11 @@ const accountSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  fullName: {
-    type: String,
-    required: true,
-    trim: true
-  },
+  // fullName: {
+  //   type: String,
+  //   required: true,
+  //   trim: true
+  // },
   avatar: {
     type: String,
     default: null
@@ -28,6 +28,10 @@ const accountSchema = new mongoose.Schema({
     type: Number,
     enum: [0, 1], // 0: user, 1: admin
     default: 0
+  },
+  address: {
+    type: String,
+    default: null,
   }
 }, {
   timestamps: true

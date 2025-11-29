@@ -28,7 +28,7 @@ async function register(req, res) {
       avatar: avatar || null,
       dateOfBirth: dateOfBirth || null,
       role: role || 0,
-      address: address || {}
+      address: address || null
     });
 
     // Return account without password

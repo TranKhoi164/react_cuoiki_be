@@ -1,6 +1,7 @@
 const express = require("express");
 const Product = require("../models/Product");
-const productController= require("../controller/productController")
+const productController = require("../controller/productController")
+const authorizeAdmin = require("../middlewares/authorizeAdmin");
 const router = express.Router();
 
 router.get("/", productController.getproduct);
@@ -13,5 +14,5 @@ router.put("/:id", productController.updateProduct);
 
 router.delete("/:id", productController.deleteProduct);
 
-module.exports=router
+module.exports = router
 

@@ -1,5 +1,5 @@
 const Account = require("../models/Account");
-
+const mongoose = require('mongoose'); // <-- Đảm bảo dòng này tồn tại và đúng
 // Register: Create new account
 async function register(req, res) {
   try {
@@ -104,9 +104,88 @@ async function logout(req, res) {
   }
 }
 
+const getAccountById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    console.log('id: ', id);
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'ID tài khoản không hợp lệ.' });
+    }
+
+    // Lấy thông tin tài khoản (loại trừ trường nhạy cảm như password)
+    const account = await Account.findById(id).select('-password');
+
+    if (!account) {
+      return res.status(404).json({ message: 'Không tìm thấy tài khoản.' });
+    }
+
+    res.status(200).json(account);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error getting account by id",
+      error: error.message
+    });
+  }
+};
+
+const updateAccount = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Chỉ cho phép cập nhật các trường sau:
+    const allowedUpdates = ['dateOfBirth', 'address', 'username'];
+    const updates = Object.keys(req.body);
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
+
+    if (!isValidOperation) {
+      return res.status(400).json({ message: 'Trường cập nhật không hợp lệ.' });
+    }
+
+    // NGĂN CHẶN CẬP NHẬT PASSWORD và ROLE trực tiếp qua API này
+    if (req.body.password || req.body.role) {
+      return res.status(403).json({ message: 'Không được phép cập nhật mật khẩu hoặc vai trò qua API này.' });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'ID tài khoản không hợp lệ.' });
+    }
+
+    const account = await Account.findById(id);
+
+    if (!account) {
+      return res.status(404).json({ message: 'Không tìm thấy tài khoản.' });
+    }
+
+    // Áp dụng các thay đổi
+    updates.forEach((update) => account[update] = req.body[update]);
+
+    // Đặt { new: true } để trả về document sau khi cập nhật
+    await account.save();
+
+    // Trả về thông tin tài khoản đã cập nhật (loại trừ password)
+    const updatedAccount = await Account.findById(id).select('-password');
+
+    res.status(200).json({
+      message: 'Cập nhật thông tin tài khoản thành công.',
+      account: updatedAccount
+    });
+
+  } catch (error) {
+    // Xử lý lỗi unique (ví dụ: username đã tồn tại)
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.' });
+    }
+    handleServerError(res, error);
+  }
+};
+
 module.exports = {
   register,
   login,
-  logout
+  logout,
+  getAccountById,
+  updateAccount
 };
 

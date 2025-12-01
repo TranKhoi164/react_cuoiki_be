@@ -16,10 +16,10 @@ const accountSchema = new mongoose.Schema({
   //   required: true,
   //   trim: true
   // },
-  avatar: {
-    type: String,
-    default: null
-  },
+  // avatar: {
+  //   type: String,
+  //   default: null
+  // },
   dateOfBirth: {
     type: Date,
     default: null

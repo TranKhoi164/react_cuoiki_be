@@ -1,6 +1,7 @@
 const express = require("express");
 const Product = require("../models/Product");
 const productController= require("../controller/productController")
+const authorizeAdmin = require("../middleware/authorizeAdmin");
 const router = express.Router();
 
 router.get("/", productController.getproduct);

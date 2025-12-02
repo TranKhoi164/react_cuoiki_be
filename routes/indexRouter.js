@@ -5,7 +5,7 @@ const orderRouter = require('./orderRoutes')
 function routes(app) {
     app.use('/products', productrouter);
     app.use('/accounts', accountRouter);
-    app.use('/order', orderRouter)
+    app.use('/orders', orderRouter)
 }
 
 module.exports = routes

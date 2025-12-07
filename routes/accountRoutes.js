@@ -9,6 +9,7 @@ router.get('/:id', accountController.getAccountById);
 // PATCH /api/accounts/:id
 // Cập nhật thông tin tài khoản
 router.patch('/:id', accountController.updateAccount);
+router.get('/', accountController.getAllAccountInfor)
 
 module.exports = router;
 

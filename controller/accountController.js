@@ -130,6 +130,26 @@ const getAccountById = async (req, res) => {
   }
 };
 
+const getAllAccountInfor = async (req, res) => {
+  try {
+    // Lấy thông tin tài khoản (loại trừ trường nhạy cảm như password)
+    const accounts = await Account.find({})
+
+    if (!accounts) {
+      return res.status(404).json({ message: 'Không tìm thấy tài khoản.' });
+    }
+
+    res.status(200).json(accounts);
+  } catch (error) {
+    console.log('error', error);
+
+    res.status(500).json({
+      message: "Error getting account",
+      error: error.message
+    });
+  }
+}
+
 const updateAccount = async (req, res) => {
   try {
     const { id } = req.params;
@@ -186,6 +206,7 @@ module.exports = {
   login,
   logout,
   getAccountById,
-  updateAccount
+  updateAccount,
+  getAllAccountInfor
 };
 

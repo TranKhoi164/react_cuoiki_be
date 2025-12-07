@@ -175,7 +175,7 @@ exports.updateOrderStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    const validStatuses = ['pending', 'beingShipped', 'delivered', 'cancelled'];
+    const validStatuses = ['inCart', 'pending', 'beingShipped', 'delivered', 'cancelled'];
     if (!status || !validStatuses.includes(status)) {
       return res.status(400).json({ message: 'Trạng thái không hợp lệ.' });
     }

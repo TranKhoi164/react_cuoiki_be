@@ -1,20 +1,20 @@
 const mongoose = require("mongoose");
 
 const ProductSchema = new mongoose.Schema({
-  category: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Category",
-    required: true
-  },
-  sku: String,
+  // category: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "Category",
+  //   required: true
+  // },
+  // sku: String,
 
   // Mảng thuộc tính dạng {"key": "", "value": ""}
-  attributes: [
-    {
-      key: String,
-      value: String
-    }
-  ],
+  // attributes: [
+  //   {
+  //     key: String,
+  //     value: String
+  //   }
+  // ],
 
   // Mảng hình ảnh (URL)
   // images: [String],
@@ -29,6 +29,7 @@ const ProductSchema = new mongoose.Schema({
   quantity: {
     type: Number,
     default: 0,
+    min: 0
   }
 },
   { timestamps: true });

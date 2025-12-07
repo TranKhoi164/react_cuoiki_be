@@ -51,25 +51,42 @@ const createImportOrder = async (req, res) => {
       importDetailsToCreate.push(importDetail.save());
 
       // Cập nhật inventory (CHỈ cập nhật nếu tồn tại)
-      const inventoryUpdate = await Inventory.findOneAndUpdate(
-        { product: detail.productId },
-        { 
-          $inc: { 
-            stock: detail.quantity,
-            quantity: detail.quantity 
-          },
-          $set: { price: detail.price }
-        },
-        { new: true }
-      );
+      // const inventoryUpdate = await Inventory.findOneAndUpdate(
+      //   { product: detail.productId },
+      //   { 
+      //     $inc: { 
+      //       stock: detail.quantity,
+      //       quantity: detail.quantity 
+      //     },
+      //     $set: { price: detail.price }
+      //   },
+      //   { new: true }
+      // );
+
+      // if (inventoryUpdate) {
+      //   console.log(`✅ Đã cập nhật inventory: ${inventoryUpdate._id}`);
+      // } else {
+      //   console.log(`⚠️ Không tìm thấy inventory cho sản phẩm ${detail.productId}, bỏ qua`);
+      // }
+      let inventoryUpdate = await Inventory.findOne({ product: detail.productId });
 
       if (inventoryUpdate) {
-        console.log(`✅ Đã cập nhật inventory: ${inventoryUpdate._id}`);
+        // Nếu đã tồn tại, cộng thêm quantity
+        inventoryUpdate.quantity += detail.quantity;
+        inventoryUpdate.price = detail.price;
+        await inventoryUpdate.save();
       } else {
-        console.log(`⚠️ Không tìm thấy inventory cho sản phẩm ${detail.productId}, bỏ qua`);
+        // Nếu chưa tồn tại, tạo mới
+        inventoryUpdate = new Inventory({
+          product: detail.productId,
+          quantity: detail.quantity,
+          price: detail.price
+        });
+        await inventoryUpdate.save();
       }
+      console.log(`✅ Đã cập nhật inventory: ${inventoryUpdate._id}, số lượng: ${inventoryUpdate.quantity}`);
 
-      // Cập nhật product quantity
+      // Cập nhật product quantity (đồng bộ với inventory)
       const productUpdate = await Product.findByIdAndUpdate(
         detail.productId,
         { 
@@ -214,9 +231,9 @@ const deleteImportOrder = async (req, res) => {
 
     // Reverse inventory updates
     for (const detail of importDetails) {
+      // Cập nhật inventory
       const inventory = await Inventory.findOne({ product: detail.productId });
       if (inventory) {
-        inventory.stock = Math.max(0, inventory.stock - detail.quantity);
         inventory.quantity = Math.max(0, inventory.quantity - detail.quantity);
         await inventory.save();
       }
@@ -224,7 +241,7 @@ const deleteImportOrder = async (req, res) => {
       // Update product quantity
       const product = await Product.findById(detail.productId);
       if (product) {
-        product.quantity = Math.max(0, (product.quantity || 0) - detail.quantity);
+        product.quantity = Math.max(0, product.quantity - detail.quantity);
         await product.save();
       }
     }

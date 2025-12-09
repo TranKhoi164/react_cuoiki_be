@@ -1,4 +1,5 @@
 const Product = require("../models/Product");
+const Inventory = require("../models/Inventory"); // Đảm bảo đường dẫn đúng
 
 async function getproduct(req, res) {
   try {
@@ -59,9 +60,14 @@ async function getProductbyid(req, res) {
 
 async function addProduct(req, res) {
   try {
+    console.log('🟡 Creating product with data:', req.body); // THÊM LOG
+    console.log('🔍 Request headers:', req.headers); // THÊM LOG
     const product = await Product.create(req.body);
+    console.log('✅ Product created:', product._id); // THÊM LOG
     res.status(201).json({ message: "Created", data: product });
   } catch (error) {
+    console.error('❌ Failed to create product:', error.message); // THÊM LOG
+    console.error('❌ Error details:', error); // THÊM LOG
     res.status(400).json({
       message: "Failed to create product",
       error: error.message
